@@ -1,4 +1,4 @@
-18:28:27 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+23:27:43 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
 make -j20 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
@@ -7,11 +7,11 @@ Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
 arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
 arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
    text	   data	    bss	    dec	    hex	filename
-  74372	    156	  47620	 122148	  1dd24	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+  79616	    176	  30696	 110488	  1af98	2024-IOS-MD02-Rodrigo-Laurinovics.elf
 Finished building: default.size.stdout
  
 Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
  
 
-18:28:27 Build Finished. 0 errors, 0 warnings. (took 373ms)
+23:27:43 Build Finished. 0 errors, 0 warnings. (took 374ms)
 

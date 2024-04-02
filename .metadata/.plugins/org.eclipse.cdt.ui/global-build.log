@@ -1,4 +1,4 @@
-18:22:37 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+22:39:25 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
 make -j20 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
@@ -7,19 +7,19 @@ Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
 arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
 arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
    text	   data	    bss	    dec	    hex	filename
-  74404	    156	  47620	 122180	  1dd44	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+  79112	    176	  33224	 112512	  1b780	2024-IOS-MD02-Rodrigo-Laurinovics.elf
 Finished building: default.size.stdout
  
 Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
  
-18:22:47 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+22:39:28 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
 make -j20 all 
 arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
    text	   data	    bss	    dec	    hex	filename
-  74404	    156	  47620	 122180	  1dd44	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+  79112	    176	  33224	 112512	  1b780	2024-IOS-MD02-Rodrigo-Laurinovics.elf
 Finished building: default.size.stdout
  
-18:26:49 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+22:52:40 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
 make -j20 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
@@ -28,12 +28,12 @@ Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
 arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
 arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
    text	   data	    bss	    dec	    hex	filename
-  74388	    156	  47620	 122164	  1dd34	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+  79080	    176	  33224	 112480	  1b760	2024-IOS-MD02-Rodrigo-Laurinovics.elf
 Finished building: default.size.stdout
  
 Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
  
-18:28:27 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+23:06:00 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
 make -j20 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
@@ -42,7 +42,188 @@ Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
 arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
 arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
    text	   data	    bss	    dec	    hex	filename
-  74372	    156	  47620	 122148	  1dd24	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+  78872	    176	  30696	 109744	  1acb0	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:11:09 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79776	    176	  30696	 110648	  1b038	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:11:52 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79384	    176	  30696	 110256	  1aeb0	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:13:35 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79416	    176	  30696	 110288	  1aed0	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:16:22 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'splitUint8Array':
+../Core/Src/main.c:886:40: warning: implicit declaration of function 'malloc' [-Wimplicit-function-declaration]
+  886 |                 cmd.cmd_data = (char *)malloc((cmdDataLength + 1) * sizeof(char));
+      |                                        ^~~~~~
+../Core/Src/main.c:30:1: note: include '<stdlib.h>' or provide a declaration of 'malloc'
+   29 | #include <math.h>
+  +++ |+#include <stdlib.h>
+   30 | /* USER CODE END Includes */
+../Core/Src/main.c:886:40: warning: incompatible implicit declaration of built-in function 'malloc' [-Wbuiltin-declaration-mismatch]
+  886 |                 cmd.cmd_data = (char *)malloc((cmdDataLength + 1) * sizeof(char));
+      |                                        ^~~~~~
+../Core/Src/main.c:886:40: note: include '<stdlib.h>' or provide a declaration of 'malloc'
+../Core/Src/main.c:886:30: warning: pointer targets in assignment from 'char *' to 'uint8_t *' {aka 'unsigned char *'} differ in signedness [-Wpointer-sign]
+  886 |                 cmd.cmd_data = (char *)malloc((cmdDataLength + 1) * sizeof(char));
+      |                              ^
+../Core/Src/main.c:890:25: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+  890 |                         exit(EXIT_FAILURE);
+      |                         ^~~~
+../Core/Src/main.c:890:25: note: include '<stdlib.h>' or provide a declaration of 'exit'
+../Core/Src/main.c:890:25: warning: incompatible implicit declaration of built-in function 'exit' [-Wbuiltin-declaration-mismatch]
+../Core/Src/main.c:890:25: note: include '<stdlib.h>' or provide a declaration of 'exit'
+../Core/Src/main.c:890:30: error: 'EXIT_FAILURE' undeclared (first use in this function)
+  890 |                         exit(EXIT_FAILURE);
+      |                              ^~~~~~~~~~~~
+../Core/Src/main.c:890:30: note: 'EXIT_FAILURE' is defined in header '<stdlib.h>'; did you forget to '#include <stdlib.h>'?
+../Core/Src/main.c:890:30: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c: In function 'MY_Process_CMD':
+../Core/Src/main.c:1097:28: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'uint8_t *' {aka 'unsigned char *'} [-Wformat=]
+ 1097 |         printf("CMD_DATA: %u\n", cmd.cmd_data);
+      |                           ~^     ~~~~~~~~~~~~
+      |                            |        |
+      |                            |        uint8_t * {aka unsigned char *}
+      |                            unsigned int
+      |                           %hhn
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j20 all" terminated with exit code 2. Build might be incomplete.
+23:17:32 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'MY_Process_CMD':
+../Core/Src/main.c:1087:28: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'uint8_t *' {aka 'unsigned char *'} [-Wformat=]
+ 1087 |         printf("CMD_DATA: %u\n", cmd.cmd_data);
+      |                           ~^     ~~~~~~~~~~~~
+      |                            |        |
+      |                            |        uint8_t * {aka unsigned char *}
+      |                            unsigned int
+      |                           %hhn
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79432	    176	  30696	 110304	  1aee0	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:17:46 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79432	    176	  30696	 110304	  1aee0	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:19:35 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'MY_Process_CMD':
+../Core/Src/main.c:1086:26: warning: format '%u' expects argument of type 'unsigned int', but argument 2 has type 'uint8_t *' {aka 'unsigned char *'} [-Wformat=]
+ 1086 |         printf("CMD_ID: %u\n", cmd.cmd_id);
+      |                         ~^     ~~~~~~~~~~
+      |                          |        |
+      |                          |        uint8_t * {aka unsigned char *}
+      |                          unsigned int
+      |                         %hhn
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79448	    176	  30696	 110320	  1aef0	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:19:51 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79448	    176	  30696	 110320	  1aef0	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:22:58 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79616	    176	  30696	 110488	  1af98	2024-IOS-MD02-Rodrigo-Laurinovics.elf
+Finished building: default.size.stdout
+ 
+Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list
+ 
+23:27:43 **** Incremental Build of configuration Debug for project 2024-IOS-MD02-Rodrigo-Laurinovics ****
+make -j20 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../USB_HOST/App -I../USB_HOST/Target -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc -I../Middlewares/ST/STM32_USB_Host_Library/Class/CDC/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 2024-IOS-MD02-Rodrigo-Laurinovics.elf
+ 
+arm-none-eabi-size  2024-IOS-MD02-Rodrigo-Laurinovics.elf 
+arm-none-eabi-objdump -h -S 2024-IOS-MD02-Rodrigo-Laurinovics.elf  > "2024-IOS-MD02-Rodrigo-Laurinovics.list"
+   text	   data	    bss	    dec	    hex	filename
+  79616	    176	  30696	 110488	  1af98	2024-IOS-MD02-Rodrigo-Laurinovics.elf
 Finished building: default.size.stdout
  
 Finished building: 2024-IOS-MD02-Rodrigo-Laurinovics.list

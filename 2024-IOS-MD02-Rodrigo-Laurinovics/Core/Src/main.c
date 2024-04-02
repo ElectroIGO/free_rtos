@@ -20,11 +20,13 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usb_host.h"
-#include <stdio.h>
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "LIS3DSH.h"
+#include <stdio.h>
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -38,10 +40,12 @@
 #define flag_msg_rtc 		(0x01)
 #define flag_msg_acc		(0x02)
 
-#define RXBUFF_SIZE 512
-#define MAINBUFF_SIZE 2048
+//#define RXBUFF_SIZE 512
+//#define MAINBUFF_SIZE 2048
+#define RXBUFF_SIZE 10
+#define MAINBUFF_SIZE 20
 
-#define sampling_rate 1600
+#define sampling_rate 1600 / 4
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -190,6 +194,13 @@ uint8_t Main_Buf[MAINBUFF_SIZE];
 uint16_t oldPos, newPos = 0;
 uint8_t msg_buffer[100] = {0};
 uint32_t packet_counter = 0;
+
+float pitch, roll;
+
+typedef struct {
+	uint8_t cmd_id[2];
+    uint8_t cmd_data[5];
+} Command;
 
 /* USER CODE END 0 */
 
@@ -786,10 +797,6 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-//	if(GPIO_Pin == B1_Pin){
-//		BaseType_t checkifYieldRequired = xTaskResumeFromISR(myIntTaskHandle);
-//		portYIELD_FROM_ISR(checkifYieldRequired);
-//	}
 	if(GPIO_Pin == MEMS_INT1_Pin){
 		osThreadFlagsSet(myGetAccDataHandle, 0x0001);
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
@@ -809,43 +816,72 @@ int __io_putchar(int ch) {
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 	if (huart->Instance == USART2) {
-		oldPos = newPos;  // Update the last position before copying new data
-
-		/* If the data in large and it is about to exceed the buffer size, we have to route it to the start of the buffer
-		 * This is to maintain the circular buffer
-		 * The old data in the main buffer will be overlapped
-		 */
-	// If the current position + new data size is greater than the main buffer
-		if (oldPos+Size > MAINBUFF_SIZE){
-			uint16_t datatocopy = MAINBUFF_SIZE-oldPos;  // find out how much space is left in the main buffer
-			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, datatocopy);  // copy data in that remaining space
-
-			oldPos = 0;  // point to the start of the buffer
-			memcpy ((uint8_t *)Main_Buf, (uint8_t *)Rx_Buf+datatocopy, (Size-datatocopy));  // copy the remaining data
-			newPos = (Size-datatocopy);  // update the position
-		} else {
-			/* if the current position + new data size is less than the main buffer
-			 * we will simply copy the data into the buffer and update the position
-			 */
-			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, Size);
-			newPos = Size+oldPos;
+//		oldPos = newPos;  // Update the last position before copying new data
+//
+//		/* If the data in large and it is about to exceed the buffer size, we have to route it to the start of the buffer
+//		 * This is to maintain the circular buffer
+//		 * The old data in the main buffer will be overlapped
+//		 */
+//	// If the current position + new data size is greater than the main buffer
+//		if (oldPos+Size > MAINBUFF_SIZE){
+//			uint16_t datatocopy = MAINBUFF_SIZE-oldPos;  // find out how much space is left in the main buffer
+//			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, datatocopy);  // copy data in that remaining space
+//
+//			oldPos = 0;  // point to the start of the buffer
+//			memcpy ((uint8_t *)Main_Buf, (uint8_t *)Rx_Buf+datatocopy, (Size-datatocopy));  // copy the remaining data
+//			newPos = (Size-datatocopy);  // update the position
+//		} else {
+//			/* if the current position + new data size is less than the main buffer
+//			 * we will simply copy the data into the buffer and update the position
+//			 */
+//			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, Size);
+//			newPos = Size+oldPos;
+//		}
+		if((Rx_Buf[0] == '<') && (Rx_Buf[9] == '>')){
+			memcpy ((uint8_t *)Main_Buf, &Rx_Buf[1], 8);
+			osThreadFlagsSet(myProcessCMDHandle, 0x0001);
+			HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
 		}
-
-
 		/* start the DMA again */
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, (uint8_t *) Rx_Buf, RXBUFF_SIZE);
 		__HAL_DMA_DISABLE_IT(&hdma_usart2_rx, DMA_IT_HT);
 	}
-	// check for *OK to indicate the end of the command
-	for (int i = 0; i < Size; i++){
-		if((Rx_Buf[i] == '*') && (Rx_Buf[i + 1] == 'O') && (Rx_Buf[i + 2] == 'K')){
-			newPos = 0;
-			osThreadFlagsSet(myProcessCMDHandle, 0x0001);
-			HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
+//	// check for *OK to indicate the end of the command
+
+
+
+}
+void calculate_pitch_roll(float ax, float ay, float az, float *pitch, float *roll) {
+//	float norm = sqrt(ax*ax + ay*ay + az*az);
+//	ax /= norm;
+//	ay /= norm;
+//	az /= norm;
+    *pitch = atan2(ax, sqrt(ay*ay + az*az));
+    *roll = atan2(-ay, sqrt(ax*ax + az*az));
+
+    // Convert angles from radians to degrees
+    *pitch = *pitch * 180.0 / M_PI;
+    *roll = *roll * 180.0 / M_PI;
+}
+
+Command split_command(uint8_t *array, size_t arraySize) {
+	Command cmd;
+	size_t delimiterIndex = 0;
+	while (delimiterIndex < arraySize && array[delimiterIndex] != ' ') {
+		delimiterIndex++;
+	}
+	if (delimiterIndex < arraySize) {
+		for (size_t i = 0; i < 2 && i < delimiterIndex; i++) {
+			cmd.cmd_id[i] = array[i];
+		}
+		for (size_t i = 0; i < 5 && i < arraySize - delimiterIndex - 1; i++) {
+			cmd.cmd_data[i] = array[delimiterIndex + 1 + i];
 		}
 	}
 
+	return cmd;
 }
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_MY_User_Message */
@@ -866,6 +902,7 @@ void MY_User_Message(void *argument)
   for(;;)
   {
     osMessageQueueGet(LIS3DSH_ProcessedDataHandle, &myLIS3DSH, NULL, osWaitForever);
+	osMessageQueueGet(RTC_DataHandle, &RTC_data, NULL, osWaitForever);
 	osMessageQueueGet(RTC_DataHandle, &RTC_data, NULL, osWaitForever);
 //	size = sprintf (msg_buffer, "%d||Year:%d Month:%d Date:%d Hours:%d Minutes:%dSeconds:%d\n", packet_counter++, sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
 //	HAL_UART_Transmit(&huart2, msg_buffer, size, 100);
@@ -991,30 +1028,32 @@ void MY_Process_AccData(void *argument)
   for(;;)
   {
 	osMessageQueueGet(LIS3DSH_DataScaledHandle, &myLIS3DSH, NULL, osWaitForever);
+	// Couldn't make function, because of HEAP memory limitation 128.
 	if(fill < sampling_rate){
 		moving_avg[0][fill] = myLIS3DSH.x;
 		moving_avg[1][fill] = myLIS3DSH.y;
 		moving_avg[2][fill] = myLIS3DSH.z;
 		fill++;
 	} else {
-		for(uint8_t i = 0; i < 3; i++)
-			avg[i] = 0;
 		for(uint16_t j = sampling_rate - 1; 0 < j; j--){
 			moving_avg[0][j] = moving_avg[0][j - 1];
-			moving_avg[1][j] = moving_avg[0][j - 1];
-			moving_avg[2][j] = moving_avg[0][j - 1];
+			moving_avg[1][j] = moving_avg[1][j - 1];
+			moving_avg[2][j] = moving_avg[2][j - 1];
 		}
 		moving_avg[0][0] = myLIS3DSH.x;
 		moving_avg[1][0] = myLIS3DSH.y;
 		moving_avg[2][0] = myLIS3DSH.z;
 		for(uint8_t i = 0; i < 3; i++){
+			avg[i] = 0.0;
 			for(uint16_t j = 0; j < sampling_rate; j++)
 				avg[i] += moving_avg[i][j];
+			avg[i] /= sampling_rate;
 		}
-		myLIS3DSH_after_filter.x = avg[0] / sampling_rate;
-		myLIS3DSH_after_filter.y = avg[1] / sampling_rate;
-		myLIS3DSH_after_filter.z = avg[2] / sampling_rate;
+		myLIS3DSH_after_filter.x = avg[0];
+		myLIS3DSH_after_filter.y = avg[1];
+		myLIS3DSH_after_filter.z = avg[2];
 		sg_myLIS3DSH = myLIS3DSH_after_filter;
+		calculate_pitch_roll(myLIS3DSH_after_filter.x, myLIS3DSH_after_filter.y , myLIS3DSH_after_filter.z, &pitch, &roll);
 		osMessageQueuePut(LIS3DSH_ProcessedDataHandle, &myLIS3DSH_after_filter, 10, 1);
 	}
   }
@@ -1031,20 +1070,28 @@ void MY_Process_AccData(void *argument)
 void MY_Process_CMD(void *argument)
 {
   /* USER CODE BEGIN MY_Process_CMD */
-
+	Command cmd;
   /* Infinite loop */
   for(;;)
   {
 	osThreadFlagsWait(0x0001, osFlagsWaitAll, osWaitForever);
-	if(strcmp((char*) Main_Buf, "GET_RTC*OK") == 0){
-		printf("RTC TIME\n");
-	} else if (strcmp((char*) Main_Buf, "GET_ACC*OK") == 0){
-		printf("ACC DATA\n");
-	} else if (strcmp((char*) Main_Buf, "LOVE*OK") == 0){
-		printf("LOVE YOU AS WELL\n");
-	} else {
-		printf("COMMAND DOES NOT EXIST\n");
-	}
+	cmd = split_command(Main_Buf, sizeof(Main_Buf) / sizeof(Main_Buf[0]));
+	printf("CMD_ID: ");
+	for(uint8_t i = 0; i < 2; i++)
+		printf("%c", cmd.cmd_id[i]);
+	printf("\nCMD_DATA: ");
+	for(uint8_t i = 0; i < 5; i++)
+		printf("%c", cmd.cmd_data[i]);
+	printf("\n");
+//	if(strcmp((char*) Main_Buf, "") == 0){
+//		printf("RTC TIME\n");
+//	} else if (strcmp((char*) Main_Buf, "GET_ACC*OK") == 0){
+//		printf("ACC DATA\n");
+//	} else if (strcmp((char*) Main_Buf, "LOVE*OK") == 0){
+//		printf("LOVE YOU AS WELL\n");
+//	} else {
+//		printf("COMMAND DOES NOT EXIST\n");
+//	}
 
   }
   /* USER CODE END MY_Process_CMD */
