@@ -20,6 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "usb_host.h"
+#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -36,11 +37,16 @@
 #define flag_msg_user 		(0x00)
 #define flag_msg_rtc 		(0x01)
 #define flag_msg_acc		(0x02)
+
+#define RXBUFF_SIZE 512
+#define MAINBUFF_SIZE 2048
+
+#define sampling_rate 1600
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define sampling_rate 600
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -179,6 +185,12 @@ LIS3DSH_DataScaled sg_myLIS3DSH;
 
 float moving_avg[3][sampling_rate];
 
+uint8_t Rx_Buf[RXBUFF_SIZE];
+uint8_t Main_Buf[MAINBUFF_SIZE];
+uint16_t oldPos, newPos = 0;
+uint8_t msg_buffer[100] = {0};
+uint32_t packet_counter = 0;
+
 /* USER CODE END 0 */
 
 /**
@@ -219,8 +231,11 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim2);
   HAL_TIM_Base_Start_IT(&htim3);
   HAL_TIM_Base_Start_IT(&htim4);
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart2, Rx_Buf, RXBUFF_SIZE);
+  __HAL_DMA_DISABLE_IT(&hdma_usart2_rx, DMA_IT_HT);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -781,15 +796,55 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	}
 }
 
-//int __io_putchar(int ch) {
-//    ITM_SendChar(ch);
-//    return ch;
+int __io_putchar(int ch) {
+    ITM_SendChar(ch);
+    return ch;
+}
+//int _write(int file, char *ptr, int len){
+//    for (int DataIdx = 0; DataIdx < len; DataIdx++)
+//        ITM_SendChar(*ptr++);
+//
+//    return len;
 //}
-int _write(int file, char *ptr, int len){
-    for (int DataIdx = 0; DataIdx < len; DataIdx++)
-        ITM_SendChar(*ptr++);
 
-    return len;
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+	if (huart->Instance == USART2) {
+		oldPos = newPos;  // Update the last position before copying new data
+
+		/* If the data in large and it is about to exceed the buffer size, we have to route it to the start of the buffer
+		 * This is to maintain the circular buffer
+		 * The old data in the main buffer will be overlapped
+		 */
+	// If the current position + new data size is greater than the main buffer
+		if (oldPos+Size > MAINBUFF_SIZE){
+			uint16_t datatocopy = MAINBUFF_SIZE-oldPos;  // find out how much space is left in the main buffer
+			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, datatocopy);  // copy data in that remaining space
+
+			oldPos = 0;  // point to the start of the buffer
+			memcpy ((uint8_t *)Main_Buf, (uint8_t *)Rx_Buf+datatocopy, (Size-datatocopy));  // copy the remaining data
+			newPos = (Size-datatocopy);  // update the position
+		} else {
+			/* if the current position + new data size is less than the main buffer
+			 * we will simply copy the data into the buffer and update the position
+			 */
+			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, Size);
+			newPos = Size+oldPos;
+		}
+
+
+		/* start the DMA again */
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, (uint8_t *) Rx_Buf, RXBUFF_SIZE);
+		__HAL_DMA_DISABLE_IT(&hdma_usart2_rx, DMA_IT_HT);
+	}
+	// check for *OK to indicate the end of the command
+	for (int i = 0; i < Size; i++){
+		if((Rx_Buf[i] == '*') && (Rx_Buf[i + 1] == 'O') && (Rx_Buf[i + 2] == 'K')){
+			newPos = 0;
+			osThreadFlagsSet(myProcessCMDHandle, 0x0001);
+			HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
+		}
+	}
+
 }
 /* USER CODE END 4 */
 
@@ -805,10 +860,20 @@ void MY_User_Message(void *argument)
   /* init code for USB_HOST */
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 5 */
+  LIS3DSH_DataScaled myLIS3DSH;
+  My_RTC_Data RTC_data;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osMessageQueueGet(LIS3DSH_ProcessedDataHandle, &myLIS3DSH, NULL, osWaitForever);
+	osMessageQueueGet(RTC_DataHandle, &RTC_data, NULL, osWaitForever);
+//	size = sprintf (msg_buffer, "%d||Year:%d Month:%d Date:%d Hours:%d Minutes:%dSeconds:%d\n", packet_counter++, sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
+//	HAL_UART_Transmit(&huart2, msg_buffer, size, 100);
+//	printf("%d", msg_buffer);
+//	size = sprintf (msg_buffer, "%d||X:%d Y:%d Z:%d\n", packet_counter++, test.x, test.y, test.z);
+//	HAL_UART_Transmit(&huart2, msg_buffer, size, 100);
+//	printf("%d", msg_buffer);
+
   }
   /* USER CODE END 5 */
 }
@@ -846,7 +911,7 @@ void MY_Get_Acc_Data(void *argument)
 {
   /* USER CODE BEGIN MY_Get_Acc_Data */
 	LIS3DSH_InitTypeDef MY_LIS3DSH_Configuration;
-	MY_LIS3DSH_Configuration.dataRate = LIS3DSH_DATARATE_800;
+	MY_LIS3DSH_Configuration.dataRate = LIS3DSH_DATARATE_1600;
 	MY_LIS3DSH_Configuration.fullScale = LIS3DSH_FULLSCALE_4;
 	MY_LIS3DSH_Configuration.antiAliasingBW = LIS3DSH_FILTER_BW_50;
 	MY_LIS3DSH_Configuration.enableAxes = LIS3DSH_XYZ_ENABLE;
@@ -966,15 +1031,21 @@ void MY_Process_AccData(void *argument)
 void MY_Process_CMD(void *argument)
 {
   /* USER CODE BEGIN MY_Process_CMD */
-	LIS3DSH_DataScaled myLIS3DSH;
-	My_RTC_Data RTC_data;
+
   /* Infinite loop */
   for(;;)
   {
-	osMessageQueueGet(LIS3DSH_ProcessedDataHandle, &myLIS3DSH, NULL, osWaitForever);
-	osMessageQueueGet(RTC_DataHandle, &RTC_data, NULL, osWaitForever);
+	osThreadFlagsWait(0x0001, osFlagsWaitAll, osWaitForever);
+	if(strcmp((char*) Main_Buf, "GET_RTC*OK") == 0){
+		printf("RTC TIME\n");
+	} else if (strcmp((char*) Main_Buf, "GET_ACC*OK") == 0){
+		printf("ACC DATA\n");
+	} else if (strcmp((char*) Main_Buf, "LOVE*OK") == 0){
+		printf("LOVE YOU AS WELL\n");
+	} else {
+		printf("COMMAND DOES NOT EXIST\n");
+	}
 
-    osDelay(1000);
   }
   /* USER CODE END MY_Process_CMD */
 }
@@ -993,9 +1064,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(htim->Instance == TIM3){
 		ulHighFrequencyTimerTicks++;
 	}
-	if(htim->Instance == TIM3){
-		osThreadFlagsSet(RTC_DataHandle, 0x0001);
-		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+	if(htim->Instance == TIM2){
+		osThreadFlagsSet(myRTCTimeHandle, 0x0001);
+		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 	}
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM6) {
