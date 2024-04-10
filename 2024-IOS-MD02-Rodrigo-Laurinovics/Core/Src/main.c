@@ -21,7 +21,6 @@
 #include "cmsis_os.h"
 #include "usb_host.h"
 
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "LIS3DSH.h"
@@ -42,10 +41,9 @@
 
 //#define RXBUFF_SIZE 512
 //#define MAINBUFF_SIZE 2048
-#define RXBUFF_SIZE 10
-#define MAINBUFF_SIZE 20
+#define RXBUFF_SIZE 11
 
-#define sampling_rate 1600 / 4
+#define sampling_rate 1600 / 8
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -73,7 +71,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 osThreadId_t myUserMsgHandle;
 const osThreadAttr_t myUserMsg_attributes = {
   .name = "myUserMsg",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for myRTCTime */
@@ -108,7 +106,7 @@ const osThreadAttr_t myfreeRTOSManager_attributes = {
 osThreadId_t myProcessAccDataHandle;
 const osThreadAttr_t myProcessAccData_attributes = {
   .name = "myProcessAccData",
-  .stack_size = 128 * 4,
+  .stack_size = 2096 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for myProcessCMD */
@@ -132,6 +130,11 @@ const osMessageQueueAttr_t LIS3DSH_ProcessedData_attributes = {
 osMessageQueueId_t RTC_DataHandle;
 const osMessageQueueAttr_t RTC_Data_attributes = {
   .name = "RTC_Data"
+};
+/* Definitions for CMD_ProcData */
+osMessageQueueId_t CMD_ProcDataHandle;
+const osMessageQueueAttr_t CMD_ProcData_attributes = {
+  .name = "CMD_ProcData"
 };
 /* USER CODE BEGIN PV */
 
@@ -186,20 +189,16 @@ uint8_t flag = flag_msg_user;
 LIS3DSH_DataScaled g_myLIS3DSH;
 LIS3DSH_DataScaled sg_myLIS3DSH;
 
-
-float moving_avg[3][sampling_rate];
-
 uint8_t Rx_Buf[RXBUFF_SIZE];
-uint8_t Main_Buf[MAINBUFF_SIZE];
 uint16_t oldPos, newPos = 0;
-uint8_t msg_buffer[100] = {0};
+uint8_t msg_buffer[1024] = {0};
 uint32_t packet_counter = 0;
 
-float pitch, roll;
+
 
 typedef struct {
-	uint8_t cmd_id[2];
-    uint8_t cmd_data[5];
+	uint8_t cmd_id[3];
+    uint8_t cmd_data[6];
 } Command;
 
 /* USER CODE END 0 */
@@ -273,6 +272,9 @@ int main(void)
 
   /* creation of RTC_Data */
   RTC_DataHandle = osMessageQueueNew (3, sizeof(My_RTC_Data), &RTC_Data_attributes);
+
+  /* creation of CMD_ProcData */
+  CMD_ProcDataHandle = osMessageQueueNew (3, sizeof(Command), &CMD_ProcData_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -532,7 +534,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 8400;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 2000;
+  htim2.Init.Period = 50000;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -807,50 +809,31 @@ int __io_putchar(int ch) {
     ITM_SendChar(ch);
     return ch;
 }
-//int _write(int file, char *ptr, int len){
-//    for (int DataIdx = 0; DataIdx < len; DataIdx++)
-//        ITM_SendChar(*ptr++);
-//
-//    return len;
-//}
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
 	if (huart->Instance == USART2) {
-//		oldPos = newPos;  // Update the last position before copying new data
-//
-//		/* If the data in large and it is about to exceed the buffer size, we have to route it to the start of the buffer
-//		 * This is to maintain the circular buffer
-//		 * The old data in the main buffer will be overlapped
-//		 */
-//	// If the current position + new data size is greater than the main buffer
-//		if (oldPos+Size > MAINBUFF_SIZE){
-//			uint16_t datatocopy = MAINBUFF_SIZE-oldPos;  // find out how much space is left in the main buffer
-//			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, datatocopy);  // copy data in that remaining space
-//
-//			oldPos = 0;  // point to the start of the buffer
-//			memcpy ((uint8_t *)Main_Buf, (uint8_t *)Rx_Buf+datatocopy, (Size-datatocopy));  // copy the remaining data
-//			newPos = (Size-datatocopy);  // update the position
-//		} else {
-//			/* if the current position + new data size is less than the main buffer
-//			 * we will simply copy the data into the buffer and update the position
-//			 */
-//			memcpy ((uint8_t *)Main_Buf+oldPos, Rx_Buf, Size);
-//			newPos = Size+oldPos;
-//		}
-		if((Rx_Buf[0] == '<') && (Rx_Buf[9] == '>')){
-			memcpy ((uint8_t *)Main_Buf, &Rx_Buf[1], 8);
-			osThreadFlagsSet(myProcessCMDHandle, 0x0001);
-			HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
-		}
-		/* start the DMA again */
+		osThreadFlagsSet(myProcessCMDHandle, 0x0001);
+		HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
 		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, (uint8_t *) Rx_Buf, RXBUFF_SIZE);
 		__HAL_DMA_DISABLE_IT(&hdma_usart2_rx, DMA_IT_HT);
 	}
-//	// check for *OK to indicate the end of the command
-
-
-
 }
+/** ----------------------------------------------------------------------------------------------
+* @brief
+* This function calculates the pitch and roll angles based on the accelerometer readings.
+*
+* @param
+* ax: Accelerometer reading along the X-axis.
+* ay: Accelerometer reading along the Y-axis.
+* az: Accelerometer reading along the Z-axis.
+* @param
+* pitch: Pointer to a variable where the calculated pitch angle will be stored.
+* roll: Pointer to a variable where the calculated roll angle will be stored.
+*
+* @returns
+* This function does not return a value directly, but it updates the values pointed to by 'pitch' and 'roll'
+* with the calculated pitch and roll angles, respectively.
+*/
 void calculate_pitch_roll(float ax, float ay, float az, float *pitch, float *roll) {
 //	float norm = sqrt(ax*ax + ay*ay + az*az);
 //	ax /= norm;
@@ -859,29 +842,71 @@ void calculate_pitch_roll(float ax, float ay, float az, float *pitch, float *rol
     *pitch = atan2(ax, sqrt(ay*ay + az*az));
     *roll = atan2(-ay, sqrt(ax*ax + az*az));
 
-    // Convert angles from radians to degrees
     *pitch = *pitch * 180.0 / M_PI;
     *roll = *roll * 180.0 / M_PI;
 }
+/** ----------------------------------------------------------------------------------------------
+* @brief
+* This function applies a moving average filter to the input accelerometer data and returns the filtered data.
+*
+* @param
+* myLIS3DSH: The input accelerometer data to be filtered.
+* mov_avg: A 2D array representing the moving average buffer for each axis (x, y, z).
+* fill: A pointer to a variable indicating the current fill level of the moving average buffer.
+*
+* @returns
+* Returns the filtered accelerometer data scaled to the LIS3DSH_DataScaled structure.
+*/
+LIS3DSH_DataScaled moving_average_filter(LIS3DSH_DataScaled myLIS3DSH, float mov_avg[3][sampling_rate], uint16_t* fill) {
+    double avg[3] = {0};
+    LIS3DSH_DataScaled LIS3DSH;
 
-Command split_command(uint8_t *array, size_t arraySize) {
-	Command cmd;
-	size_t delimiterIndex = 0;
-	while (delimiterIndex < arraySize && array[delimiterIndex] != ' ') {
-		delimiterIndex++;
-	}
-	if (delimiterIndex < arraySize) {
-		for (size_t i = 0; i < 2 && i < delimiterIndex; i++) {
-			cmd.cmd_id[i] = array[i];
-		}
-		for (size_t i = 0; i < 5 && i < arraySize - delimiterIndex - 1; i++) {
-			cmd.cmd_data[i] = array[delimiterIndex + 1 + i];
-		}
-	}
+    if (*fill >= sampling_rate)
+        *fill = 0;
 
+    mov_avg[0][*fill] = myLIS3DSH.x;
+    mov_avg[1][*fill] = myLIS3DSH.y;
+    mov_avg[2][*fill] = myLIS3DSH.z;
+
+    for (uint16_t i = 0; i < sampling_rate; i++) {
+        for (uint8_t j = 0; j < 3; j++) {
+            avg[j] += mov_avg[j][i];
+        }
+    }
+
+    LIS3DSH.x = avg[0] / sampling_rate;
+	LIS3DSH.y = avg[1] / sampling_rate;
+	LIS3DSH.z = avg[2] / sampling_rate;
+
+    (*fill)++;
+
+    return LIS3DSH;
+}
+/** ----------------------------------------------------------------------------------------------
+* @brief
+* Checks and parses a command received via UART from a buffer.
+*
+* @param
+* rx_buf: Pointer to the buffer containing the received command.
+*
+* @returns
+* Returns a Command structure representing the parsed command. If the received command
+* meets the expected format, the parsed command is returned with its components filled accordingly.
+* Otherwise, a default Command structure with "UN" as cmd_id and "KNOWN" as cmd_data is returned,
+* and the rx_buf is cleared.
+*/
+Command check_command_from_uart(uint8_t *rx_buf){
+	Command cmd = {0};
+	if ((rx_buf[0] == '<') && (rx_buf[9] == '>') && (rx_buf[3] == ' ')) {
+		memcpy(cmd.cmd_id, &rx_buf[1], 2);
+		memcpy(cmd.cmd_data, &rx_buf[4], 5);
+	} else {
+		memcpy(cmd.cmd_id, "UN", 2);
+		memcpy(cmd.cmd_data, "KNOWN", 5);
+		memset(rx_buf, 0, RXBUFF_SIZE);
+	}
 	return cmd;
 }
-
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_MY_User_Message */
@@ -898,18 +923,98 @@ void MY_User_Message(void *argument)
   /* USER CODE BEGIN 5 */
   LIS3DSH_DataScaled myLIS3DSH;
   My_RTC_Data RTC_data;
+  My_RTC_Data RTC_time_to_set;
+  Command cmd;
+  size_t size = 0;
   /* Infinite loop */
   for(;;)
   {
     osMessageQueueGet(LIS3DSH_ProcessedDataHandle, &myLIS3DSH, NULL, osWaitForever);
 	osMessageQueueGet(RTC_DataHandle, &RTC_data, NULL, osWaitForever);
-	osMessageQueueGet(RTC_DataHandle, &RTC_data, NULL, osWaitForever);
-//	size = sprintf (msg_buffer, "%d||Year:%d Month:%d Date:%d Hours:%d Minutes:%dSeconds:%d\n", packet_counter++, sDate.Year, sDate.Month, sDate.Date, sTime.Hours, sTime.Minutes, sTime.Seconds);
-//	HAL_UART_Transmit(&huart2, msg_buffer, size, 100);
-//	printf("%d", msg_buffer);
-//	size = sprintf (msg_buffer, "%d||X:%d Y:%d Z:%d\n", packet_counter++, test.x, test.y, test.z);
-//	HAL_UART_Transmit(&huart2, msg_buffer, size, 100);
-//	printf("%d", msg_buffer);
+	osMessageQueueGet(CMD_ProcDataHandle, &cmd, NULL, osWaitForever);
+	if(strcmp((char *)cmd.cmd_id, "RO") == 0) {
+		if(strcmp((char *)cmd.cmd_data, "ACCEL") == 0){
+			size = sprintf ((char *)msg_buffer, "Time: %02d-%02d-%02d %02d:%02d:%02d\nPitch: %f\nRoll: %f\n", RTC_data.sDate.Date, RTC_data.sDate.Month, RTC_data.sDate.Year, RTC_data.sTime.Hours, RTC_data.sTime.Minutes, RTC_data.sTime.Seconds, myLIS3DSH.pitch, myLIS3DSH.roll);
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		} else if(strcmp((char *)cmd.cmd_data, "RAWAC") == 0) {
+			size = sprintf ((char *)msg_buffer, "Time: %02d-%02d-%02d %02d:%02d:%02d\nRaw x: %f\nRaw y: %f\nRaw z: %f\n", RTC_data.sDate.Date, RTC_data.sDate.Month, RTC_data.sDate.Year, RTC_data.sTime.Hours, RTC_data.sTime.Minutes, RTC_data.sTime.Seconds, myLIS3DSH.x, myLIS3DSH.y, myLIS3DSH.z);
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		} else if(strcmp((char *)cmd.cmd_data, "RTCDA") == 0) {
+			size = sprintf ((char *)msg_buffer, "%02d-%02d-20%02d\n", RTC_data.sDate.Date, RTC_data.sDate.Month, RTC_data.sDate.Year);
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		} else if(strcmp((char *)cmd.cmd_data, "RTCTI") == 0) {
+			size = sprintf ((char *)msg_buffer, "%02d:%02d:%02d\n", RTC_data.sTime.Hours, RTC_data.sTime.Minutes, RTC_data.sTime.Seconds);
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		} else if(strcmp((char *)cmd.cmd_data, "RTCHO") == 0) {
+			size = sprintf ((char *)msg_buffer, "%02d-%02d-20%02d %02d:%02d:%02d\n",RTC_data.sDate.Date, RTC_data.sDate.Month, RTC_data.sDate.Year, RTC_data.sTime.Hours, RTC_data.sTime.Minutes, RTC_data.sTime.Seconds);
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		} else if(strcmp((char *)cmd.cmd_data, "-HELP") == 0) {
+			size = sprintf ((char *)msg_buffer, "Available read commands\nRTCDA - get DD/MM/YY\nRTCTI - get HH/MM/SS\nRTCHO - get both time and date\nACCEL - get boards angles relative to sensors measurement\n");
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		} else {
+			size = sprintf ((char *)msg_buffer, "Unknown read command. Available command can view with -HELP \nCMD_DATA: %s\n", (char *) cmd.cmd_data);
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		}
+	} else if(strcmp((char *)cmd.cmd_id, "WO") == 0) {
+		if(cmd.cmd_data[0] == 'T' && cmd.cmd_data[1] == 'S' && cmd.cmd_data[2] == ':'){
+			cmd.cmd_data[3] = (cmd.cmd_data[3] - '0') * 10;
+			cmd.cmd_data[4] = cmd.cmd_data[4] - '0' + cmd.cmd_data[3];
+			if(cmd.cmd_data[4] <= 60 && cmd.cmd_data[4] >= 0)
+				RTC_time_to_set.sTime.Seconds = ((cmd.cmd_data[4] / 10) << 4) | (cmd.cmd_data[4] % 10);
+		} else if(cmd.cmd_data[0] == 'T' && cmd.cmd_data[1] == 'M' && cmd.cmd_data[2] == ':') {
+			cmd.cmd_data[3] = (cmd.cmd_data[3] - '0') * 10;
+			cmd.cmd_data[4] = cmd.cmd_data[4] - '0' + cmd.cmd_data[3];
+			if(cmd.cmd_data[4] <= 60 && cmd.cmd_data[4] >= 0)
+				RTC_time_to_set.sTime.Minutes = ((cmd.cmd_data[4] / 10) << 4) | (cmd.cmd_data[4] % 10);
+		} else if(cmd.cmd_data[0] == 'T' && cmd.cmd_data[1] == 'H' && cmd.cmd_data[2] == ':') {
+			cmd.cmd_data[3] = (cmd.cmd_data[3] - '0') * 10;
+			cmd.cmd_data[4] = cmd.cmd_data[4] - '0' + cmd.cmd_data[3];
+			if(cmd.cmd_data[4] <= 24 && cmd.cmd_data[4] >= 0)
+				RTC_time_to_set.sTime.Hours = ((cmd.cmd_data[4] / 10) << 4) | (cmd.cmd_data[3] + cmd.cmd_data[4] % 10);
+		} else if(cmd.cmd_data[0] == 'D' && cmd.cmd_data[1] == 'D' && cmd.cmd_data[2] == ':'){
+			cmd.cmd_data[3] = (cmd.cmd_data[3] - '0') * 10;
+			cmd.cmd_data[4] = cmd.cmd_data[4] - '0' + cmd.cmd_data[3];
+			if(cmd.cmd_data[4] <= 31 && cmd.cmd_data[4] >= 0)
+				RTC_time_to_set.sDate.Date = ((cmd.cmd_data[4] / 10) << 4) | (cmd.cmd_data[4] % 10);
+		} else if(cmd.cmd_data[0] == 'D' && cmd.cmd_data[1] == 'M' && cmd.cmd_data[2] == ':') {
+			cmd.cmd_data[3] = (cmd.cmd_data[3] - '0') * 10;
+			cmd.cmd_data[4] = cmd.cmd_data[4] - '0' + cmd.cmd_data[3];
+			if(cmd.cmd_data[4] <= 12 && cmd.cmd_data[4] >= 0)
+				RTC_time_to_set.sDate.Month = ((cmd.cmd_data[4] / 10) << 4) | (cmd.cmd_data[4] % 10);
+		} else if(cmd.cmd_data[0] == 'D' && cmd.cmd_data[1] == 'W' && cmd.cmd_data[2] == ':') {
+			cmd.cmd_data[3] = (cmd.cmd_data[3] - '0') * 10;
+			cmd.cmd_data[4] = cmd.cmd_data[4] - '0' + cmd.cmd_data[3];
+			if(cmd.cmd_data[4] <= 7 && cmd.cmd_data[4] >= 0)
+				RTC_time_to_set.sDate.WeekDay = ((cmd.cmd_data[4] / 10) << 4) | (cmd.cmd_data[4] % 10);
+		}else if(cmd.cmd_data[0] == 'D' && cmd.cmd_data[1] == 'Y' && cmd.cmd_data[2] == ':') {
+			cmd.cmd_data[3] = (cmd.cmd_data[3] - '0') * 10;
+			cmd.cmd_data[4] = cmd.cmd_data[4] - '0' + cmd.cmd_data[3];
+			if(cmd.cmd_data[4] <= 100 && cmd.cmd_data[4] >= 0)
+				RTC_time_to_set.sDate.Year = ((cmd.cmd_data[4] / 10) << 4) | (cmd.cmd_data[4] % 10);
+		} else if(strcmp((char *)cmd.cmd_data, "TCONF") == 0) {
+			HAL_RTC_SetDate(&hrtc, &RTC_time_to_set.sDate, RTC_FORMAT_BCD);
+			HAL_RTC_SetTime(&hrtc, &RTC_time_to_set.sTime, RTC_FORMAT_BCD);
+		} else if(strcmp((char *)cmd.cmd_data, "-HELP") == 0) {
+			size = sprintf ((char *)msg_buffer, "Available write commands\nSETDA - set DD/MM/YY\nSETTI - set HH/MM/SS\nSETHO - set both time and date\n");
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		} else {
+			size = sprintf ((char *)msg_buffer, "Unknown write command. Available command can view with -HELP \nCMD_DATA: %s\n", (char *) cmd.cmd_data);
+			HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+			printf("%s", msg_buffer);
+		}
+	} else {
+		size = sprintf ((char *)msg_buffer, "Unknown command.\nCMD ID: %s\nCMD_DATA: %s\n", (char *)cmd.cmd_id, (char *) cmd.cmd_data);
+		HAL_UART_Transmit(&huart2, msg_buffer, size, 2000);
+		printf("%s", msg_buffer);
+	}
 
   }
   /* USER CODE END 5 */
@@ -931,7 +1036,13 @@ void MY_RTC_Time(void *argument)
   {
 	osThreadFlagsWait(0x0001, osFlagsWaitAll, osWaitForever);
 	HAL_RTC_GetTime(&hrtc, &RTC_data.sTime, RTC_FORMAT_BCD);
+	RTC_data.sTime.Hours = ((RTC_data.sTime.Hours & 0xF0) >> 4) * 10 + (RTC_data.sTime.Hours & 0x0F);
+	RTC_data.sTime.Minutes = ((RTC_data.sTime.Minutes & 0xF0) >> 4) * 10 + (RTC_data.sTime.Minutes & 0x0F);
+	RTC_data.sTime.Seconds = ((RTC_data.sTime.Seconds & 0xF0) >> 4) * 10 + (RTC_data.sTime.Seconds & 0x0F);
 	HAL_RTC_GetDate(&hrtc, &RTC_data.sDate, RTC_FORMAT_BCD);
+	RTC_data.sDate.Year = ((RTC_data.sDate.Year & 0xF0) >> 4) * 10 + (RTC_data.sDate.Year & 0x0F);
+	RTC_data.sDate.Month = ((RTC_data.sDate.Month & 0xF0) >> 4) * 10 + (RTC_data.sDate.Month & 0x0F);
+	RTC_data.sDate.Date = ((RTC_data.sDate.Date & 0xF0) >> 4) * 10 + (RTC_data.sDate.Date & 0x0F);
 	osMessageQueuePut(RTC_DataHandle, &RTC_data, 10, 1);
   }
   /* USER CODE END MY_RTC_Time */
@@ -1020,40 +1131,26 @@ void MY_freeRTOS_Task_Manager(void *argument)
 void MY_Process_AccData(void *argument)
 {
   /* USER CODE BEGIN MY_Process_AccData */
-	float avg[3] = {0};
 	LIS3DSH_DataScaled myLIS3DSH;
 	LIS3DSH_DataScaled myLIS3DSH_after_filter;
 	uint16_t fill = 0;
+	uint8_t fill_buff = 0;
+	float moving_avg[3][sampling_rate] = {{0}};
   /* Infinite loop */
   for(;;)
   {
 	osMessageQueueGet(LIS3DSH_DataScaledHandle, &myLIS3DSH, NULL, osWaitForever);
-	// Couldn't make function, because of HEAP memory limitation 128.
-	if(fill < sampling_rate){
+	if(fill < sampling_rate && fill_buff == 0){
 		moving_avg[0][fill] = myLIS3DSH.x;
 		moving_avg[1][fill] = myLIS3DSH.y;
 		moving_avg[2][fill] = myLIS3DSH.z;
 		fill++;
+		if(fill == sampling_rate)
+			fill_buff = 1;
 	} else {
-		for(uint16_t j = sampling_rate - 1; 0 < j; j--){
-			moving_avg[0][j] = moving_avg[0][j - 1];
-			moving_avg[1][j] = moving_avg[1][j - 1];
-			moving_avg[2][j] = moving_avg[2][j - 1];
-		}
-		moving_avg[0][0] = myLIS3DSH.x;
-		moving_avg[1][0] = myLIS3DSH.y;
-		moving_avg[2][0] = myLIS3DSH.z;
-		for(uint8_t i = 0; i < 3; i++){
-			avg[i] = 0.0;
-			for(uint16_t j = 0; j < sampling_rate; j++)
-				avg[i] += moving_avg[i][j];
-			avg[i] /= sampling_rate;
-		}
-		myLIS3DSH_after_filter.x = avg[0];
-		myLIS3DSH_after_filter.y = avg[1];
-		myLIS3DSH_after_filter.z = avg[2];
+		myLIS3DSH_after_filter = moving_average_filter(myLIS3DSH, moving_avg, &fill);
 		sg_myLIS3DSH = myLIS3DSH_after_filter;
-		calculate_pitch_roll(myLIS3DSH_after_filter.x, myLIS3DSH_after_filter.y , myLIS3DSH_after_filter.z, &pitch, &roll);
+		calculate_pitch_roll(myLIS3DSH_after_filter.x, myLIS3DSH_after_filter.y , myLIS3DSH_after_filter.z, &myLIS3DSH_after_filter.pitch, &myLIS3DSH_after_filter.roll);
 		osMessageQueuePut(LIS3DSH_ProcessedDataHandle, &myLIS3DSH_after_filter, 10, 1);
 	}
   }
@@ -1075,24 +1172,10 @@ void MY_Process_CMD(void *argument)
   for(;;)
   {
 	osThreadFlagsWait(0x0001, osFlagsWaitAll, osWaitForever);
-	cmd = split_command(Main_Buf, sizeof(Main_Buf) / sizeof(Main_Buf[0]));
-	printf("CMD_ID: ");
-	for(uint8_t i = 0; i < 2; i++)
-		printf("%c", cmd.cmd_id[i]);
-	printf("\nCMD_DATA: ");
-	for(uint8_t i = 0; i < 5; i++)
-		printf("%c", cmd.cmd_data[i]);
-	printf("\n");
-//	if(strcmp((char*) Main_Buf, "") == 0){
-//		printf("RTC TIME\n");
-//	} else if (strcmp((char*) Main_Buf, "GET_ACC*OK") == 0){
-//		printf("ACC DATA\n");
-//	} else if (strcmp((char*) Main_Buf, "LOVE*OK") == 0){
-//		printf("LOVE YOU AS WELL\n");
-//	} else {
-//		printf("COMMAND DOES NOT EXIST\n");
-//	}
-
+	cmd = check_command_from_uart(Rx_Buf);
+	if (strcmp((char *)cmd.cmd_id, "UN") != 0 && strcmp((char *)cmd.cmd_data, "KNOWN") != 0) {
+		osMessageQueuePut(CMD_ProcDataHandle, &cmd, 10, 1);
+	}
   }
   /* USER CODE END MY_Process_CMD */
 }

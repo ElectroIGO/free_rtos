@@ -69,7 +69,7 @@ main-build: 2024-IOS-MD02-Rodrigo-Laurinovics.elf secondary-outputs
 
 # Tool invocations
 2024-IOS-MD02-Rodrigo-Laurinovics.elf 2024-IOS-MD02-Rodrigo-Laurinovics.map: $(OBJS) $(USER_OBJS) /home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "2024-IOS-MD02-Rodrigo-Laurinovics.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/rodrigo/STM32CubeIDE/workspace_1.15.0/2024-IOS-MD02-Rodrigo-Laurinovics/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="2024-IOS-MD02-Rodrigo-Laurinovics.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

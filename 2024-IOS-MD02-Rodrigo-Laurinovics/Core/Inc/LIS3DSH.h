@@ -109,6 +109,8 @@ typedef struct
 	float x;
 	float y;
 	float z;
+	float pitch;
+	float roll;
 }LIS3DSH_DataScaled;
 
 //Functions prototypes
